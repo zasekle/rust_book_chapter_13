@@ -2,6 +2,7 @@ use std::thread;
 
 fn main() {
     closures();
+    processing_a_series_of_items();
 }
 
 fn closures() {
@@ -101,4 +102,74 @@ fn closures() {
 
     my_closure();
     // my_closure(); //Will not compile with a second call.
+}
+
+fn processing_a_series_of_items() {
+    //In Rust, iterators are lazy, this means they have no effect until the methods that consume the
+    // iterator are called.
+    let v = vec!["a", "b", "c"];
+
+    let v_iterator = v.iter();
+
+    for i in v_iterator {
+        println!("i: {}", i);
+    }
+
+    //Overloading an iterator in this language is actually fairly easy. First of all I just need
+    // to override basic `Item` type and the `next()` function. Then I can simply call next().
+    struct IteratorTest {
+        first: String,
+        second: String,
+        at_first: usize,
+    }
+
+    impl Iterator for IteratorTest {
+        type Item = String;
+
+        fn next(&mut self) -> Option<Self::Item> {
+            self.at_first += 1;
+            if self.at_first == 1 {
+                Some(self.first.clone())
+            } else if self.at_first == 2 {
+                Some(self.second.clone())
+            } else {
+                None
+            }
+        }
+    }
+
+    let mut iterator_test = IteratorTest{
+        first: String::from("first_string"),
+        second: String::from("second_string"),
+        at_first: 0,
+    };
+
+    //Next will `consume` or use up the iterator.
+    println!("first_test: {:?}", iterator_test.next());
+    println!("second_test: {:?}", iterator_test.next());
+    println!("none_test: {:?}", iterator_test.next());
+
+    //into_iter() will take control of the calling object.
+    let v_iter = v.into_iter();
+    let mut v = vec!["a", "b", "c", "d"];
+    let v_iter_mut = v.iter_mut();
+
+    println!("v_iter: {:?} v_iter_mut {:?}", v_iter, v_iter_mut);
+
+    //There are several inbuilt functions that consume the entire iterator. These functions are
+    // called `consuming adapters`. sum() is an example of a consuming adapter.
+    let v = vec![1,2,3];
+
+    println!("sum: {}", v.iter().sum::<i32>());
+
+    //There are also `iterator adaptors` which are methods that don't consume the iterator. Instead
+    // they produce a new (and probably different) iterator.
+    let iterator_adaptor = v.iter().map(|a| a + 1);
+
+    println!("iterator_adaptor: {:?}", iterator_adaptor);
+
+    //Things like filter and map are called directly on the iterator in this language.
+
+    //Side note. Doing something like `for i in v.iter()` is fine in rust. It will use a single
+    // iterator, not a new iterator for each access.
 }
