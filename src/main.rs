@@ -3,6 +3,7 @@ use std::thread;
 fn main() {
     closures();
     processing_a_series_of_items();
+    loops_vs_iterators();
 }
 
 fn closures() {
@@ -172,4 +173,13 @@ fn processing_a_series_of_items() {
 
     //Side note. Doing something like `for i in v.iter()` is fine in rust. It will use a single
     // iterator, not a new iterator for each access.
+}
+
+fn loops_vs_iterators() {
+    //A quote from Bjarne Stroustrup is.
+    // "In general, C++ implementations obey the zero-overhead principle: What you don’t use, you
+    // don’t pay for. And further: What you do use, you couldn’t hand code any better."
+    // This is also how Rust implements zero-overhead in its features. Iterators are an example of
+    // this, they are compiled down to roughly the same code as a for loop. But they provide a
+    // simple abstraction for the reader and writer.
 }
